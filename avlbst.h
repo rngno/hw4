@@ -351,7 +351,7 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
                 int8_t cb = LR->getBalance();
                 if (cb == 1) { parent->setBalance(-1); L->setBalance(0); }
                 else if (cb == 0) { parent->setBalance(0); L->setBalance(0); }
-                else { parent->setBalance(0); L->setBalance(1); }
+                else if (cb == -1) { parent->setBalance(0); L->setBalance(1); }
                 LR->setBalance(0);
                 child = LR;
             }
@@ -375,7 +375,7 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
                 int8_t cb = RL->getBalance();
                 if (cb == -1) { parent->setBalance(1); R->setBalance(0); }
                 else if (cb == 0) { parent->setBalance(0); R->setBalance(0); }
-                else { parent->setBalance(0); R->setBalance(-1); }
+                else if (cb == 1) { parent->setBalance(0); R->setBalance(-1); }
                 RL->setBalance(0);
                 child = RL;
             }
