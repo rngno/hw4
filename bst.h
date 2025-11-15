@@ -541,6 +541,50 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         return; // key not found
     }
 
+    // check to see if nodeToRemove has 2 kids, if so then we swap until there's only <=1 kid associated with it 
+    while (nodeToRemove->getLeft() != nullptr && nodeToRemove->getRight() != nullptr) {
+        Node<Key, Value>* pred = predecessor(nodeToRemove);
+        nodeSwap(nodeToRemove, pred); // swap so nodeToRemove will still point at the node we want to nuke but placed in pred spot
+    }
+
+    // populate a child node pointer with either the leftmost child or, after we run out of left kids, the right child
+    Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight(); // this syntax is so much better looking than the if statements that would take its place tbh
+
+    Node<Key, Value>* parent = nodeToRemove->getParent();
+
+    // ohhh my god the nesting is so ugly here
+    // if there's no parent node (i.e. we're at root) then nuke root
+    if (parent == nullptr) {
+        root_ = child;
+
+        // child becomes new root node if the rest of the tree isn't empty
+        if (child != nullptr){
+            child->setParent(nullptr);
+        }
+    }
+
+    // there is a parent node so we let a child take parent's place
+    else {
+        // can use given getters and setters declared in class 
+        // node to be nuked is on the left of our parent node, so use child to take its place
+        if (parent->getLeft() == nodeToRemove) {
+            parent->setLeft(child);
+        } 
+
+        // node to be nuked is on the right of our parent node, so use child to take its place
+        else {
+            parent->setRight(child);
+        }
+
+        // preserve tree structure by having child's parent become parent node
+        if (child != nullptr){
+            child->setParent(parent);
+        }
+    }
+
+    delete nodeToRemove;
+
+    /* old implementation, testing new stuff
     // node has no kids
     if(nodeToRemove->getLeft() == nullptr && nodeToRemove->getRight() == nullptr) {
         Node<Key, Value>* parent = nodeToRemove->getParent();  // use parent so we can keep the structure of the tree after the node gets nuked
@@ -560,6 +604,7 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
             parent->setRight(NULL); // swap out predecessor with right child
         }
         delete nodeToRemove;
+        
     }
 
     // node only has one child
@@ -594,6 +639,7 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         // go back and remove nodeToRemove (which is now in pred's original position)
         remove(key); // recursive call to remove now that we swapped
     }
+        */
 }
 
 
