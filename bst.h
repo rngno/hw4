@@ -691,7 +691,7 @@ static int checkDepth(Node<Key,Value> *root) {
     }
 
     // base case leaf node
-    if (root->left == nullptr && root->right == nullptr){
+    if (root->left_ == nullptr && root->right_ == nullptr){
         return 0; 
     }
 
