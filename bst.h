@@ -5,6 +5,7 @@
 #include <exception>
 #include <cstdlib>
 #include <utility>
+#include "equal-paths.h"
 
 /**
  * A templated class for a Node in a search tree.
