@@ -583,63 +583,6 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
     }
 
     delete nodeToRemove;
-
-    /* old implementation, testing new stuff
-    // node has no kids
-    if(nodeToRemove->getLeft() == nullptr && nodeToRemove->getRight() == nullptr) {
-        Node<Key, Value>* parent = nodeToRemove->getParent();  // use parent so we can keep the structure of the tree after the node gets nuked
-
-        // if we're at root node
-        if(parent == nullptr) {
-            root_ = nullptr; // set root to null (basically deleted tree)
-        }
-
-        // move on to left child (checking to see if left child even exists)
-        else if(parent->getLeft() == nodeToRemove) {
-            parent->setLeft(NULL); // swap out predecessor with left child
-        }
-
-        // right child
-        else {
-            parent->setRight(NULL); // swap out predecessor with right child
-        }
-        delete nodeToRemove;
-        
-    }
-
-    // node only has one child
-    else if(nodeToRemove->getLeft() == nullptr || nodeToRemove->getRight() == nullptr) {
-        Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight();
-        Node<Key, Value>* parent = nodeToRemove->getParent();
-
-        // if we're at root node
-        if(parent == nullptr) {
-            root_ = child; // swap out root with child
-            child->setParent(NULL); // set new root's parent to null, since nothing should be above it
-        }
-
-        // left child
-        else if(parent->getLeft() == nodeToRemove) {
-            parent->setLeft(child); // swap out predecessor with left child
-            child->setParent(parent); // set child's parent to nodeToRemove's parent (parent's parent)
-        }
-
-        // right child
-        else {
-            parent->setRight(child); // swap out predecessor with right child
-            child->setParent(parent); // set child's parent to nodeToRemove's parent (parent's parent)
-        }
-        delete nodeToRemove;
-    }
-
-    // node has 2 children
-    else {
-        Node<Key, Value>* pred = predecessor(nodeToRemove); 
-        nodeSwap(nodeToRemove, pred);
-        // go back and remove nodeToRemove (which is now in pred's original position)
-        remove(key); // recursive call to remove now that we swapped
-    }
-        */
 }
 
 
