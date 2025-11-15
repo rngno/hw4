@@ -352,6 +352,34 @@ Begin implementations for the BinarySearchTree class.
 -----------------------------------------------------
 */
 
+template<typename Key, typename Value>
+Node<Key,Value>* BinarySearchTree<Key,Value>::successor(Node<Key,Value>* current) {
+    // check if right child exists
+    if(current->getRight() != nullptr) {
+        Node<Key, Value>* kid = current->getRight();
+
+        // go as far down left as possible
+        while(kid->getLeft() != nullptr) {
+            kid = kid->getLeft();
+        }
+
+        return kid;
+    }
+
+    // couldn't find right child, so now we move on to parent that can actually be a successor
+    else {
+        Node<Key, Value>* ancestor = current->getParent();
+
+        // trying to find a parent that has current as its left child
+        while(ancestor != nullptr && current == ancestor->getRight()) {
+            current = ancestor; // keep track of where we're walking as we go up
+            ancestor = ancestor->getParent(); // keep walking up as necessary
+        }
+
+        return ancestor;
+    }
+}
+
 /**
 * Default constructor for a BinarySearchTree, which sets the root to NULL.
 */
