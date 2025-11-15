@@ -502,10 +502,12 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
         }
 
         // check if child is now at root of tree
+        /*
         AVLNode<Key, Value>* up = child->getParent();
         if (up == nullptr){
             break;
         }
+        */
 
         // check if left or right subtree changed and alter diff accordingly (left +1, right -1)
         //diff = (child == up->getLeft()) ? 1 : -1;
@@ -522,6 +524,8 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
         }
 
         // error handling if up doesn't get updated somehow or walks off course
+        // or also handles if child is now at root of tree
+        // another version of this in down here to test
         if (up == nullptr) {
             break;
         }
