@@ -212,7 +212,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     // TODO 
 
     // error catch if key not in tree already
-    AVLNode<Key, Value>* nodeToRemove = internalFind(key);
+    AVLNode<Key, Value>* nodeToRemove = static_cast<AVLNode<Key, Value>*>(this->internalFind(key));
     if(nodeToRemove == nullptr) {
         return; // key not found
     }
@@ -324,9 +324,9 @@ void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node){
         return;
     }
 
-    AVLNode<Key, Value>* node2 = node->getRight();
+    AVLNode<Key, Value>* node2 = node->getLeft(); // REMEMBER TO USE LEFT CHILD!!
 
-    // can't rotate if the right child doesn't exist
+    // can't rotate if the left child doesn't exist
     if(node2 == nullptr){
         return;
     }
