@@ -243,6 +243,7 @@ protected:
     Node<Key, Value>* internalFind(const Key& k) const; // TODO
     Node<Key, Value> *getSmallestNode() const;  // TODO
     static Node<Key, Value>* predecessor(Node<Key, Value>* current); // TODO
+    static Node<Key, Value>* successor(Node<Key, Value>* current); // added successor declaration as recommended in guide
     // Note:  static means these functions don't have a "this" pointer
     //        and instead just use the input argument.
 
@@ -334,7 +335,7 @@ template<class Key, class Value>
 typename BinarySearchTree<Key, Value>::iterator&
 BinarySearchTree<Key, Value>::iterator::operator++()
 {
-    current_ = BinarySearchTree<Key, Value>::predecessor(current_); // not entirely sure if this is right, but currently testing if the tests want this to walk backwards/to parent
+    current_ = BinarySearchTree<Key, Value>::successor(current_);
     return *this; // TODO want this to return the iterator, but not sure if *this is correct over current_
 }
 
