@@ -5,7 +5,7 @@
 #include <exception>
 #include <cstdlib>
 #include <utility>
-#include "equal-paths.h"
+//#include "equal-paths.h"
 
 /**
  * A templated class for a Node in a search tree.
@@ -41,6 +41,9 @@ protected:
     Node<Key, Value>* parent_;
     Node<Key, Value>* left_;
     Node<Key, Value>* right_;
+
+    // declaration for checkDepth function from equal-paths.cpp ported over here
+    static int checkDepth(Node<Key,Value>* root);
 };
 
 /*
@@ -677,6 +680,41 @@ bool BinarySearchTree<Key, Value>::isBalanced() const
 {
     // TODO
    return checkDepth(root_) != -1; // i think we can just use the helper fxn from equalPaths? this is asking for the same thing basically 
+}
+
+// helper function for isBalanced, returns -1 if unbalanced, else returns depth of subtree
+template<typename Key, typename Value>
+static int checkDepth(Node<Key,Value> *root) {
+    // base case, no children/empty subtree
+    if (root == nullptr){
+        return -2; 
+    }
+
+    // base case leaf node
+    if (root->left == nullptr && root->right == nullptr){
+        return 0; 
+    }
+
+    // check left and right subtrees for depth
+    int leftTree = checkDepth(root->left);
+    if (leftTree == -1){
+        return -1; // depth doesn't match in left subtree
+    }
+    int rightTree = checkDepth(root->right);
+    if (rightTree == -1){
+        return -1; // depth doesn't match in right subtree
+    }
+
+    // check for missing kids (that sounds weird in retrospect)
+    if (leftTree == -2){
+        return rightTree + 1; // no left child, use right depth
+    }
+    if (rightTree == -2){
+        return leftTree + 1; // no right child, use left depth
+    }
+
+    // now we know both kids are there, so compare depths
+    return (leftTree == rightTree) ? (leftTree + 1) : -1;
 }
 
 
