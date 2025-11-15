@@ -696,11 +696,11 @@ static int checkDepth(Node<Key,Value> *root) {
     }
 
     // check left and right subtrees for depth
-    int leftTree = checkDepth(root->left);
+    int leftTree = checkDepth(root->left_);
     if (leftTree == -1){
         return -1; // depth doesn't match in left subtree
     }
-    int rightTree = checkDepth(root->right);
+    int rightTree = checkDepth(root->right_);
     if (rightTree == -1){
         return -1; // depth doesn't match in right subtree
     }
