@@ -151,8 +151,6 @@ protected:
 template<class Key, class Value>
 void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
 {
-    // TODO
-
     // if tree is empty, we can just insert at root and skip the rest
     if(this->root_ == NULL) {
         this->root_ = new AVLNode<Key, Value>(new_item.first, new_item.second, NULL);
@@ -175,7 +173,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
                 AVLNode<Key, Value>* node = new AVLNode<Key, Value>(new_item.first, new_item.second, curr);
                 curr->setLeft(node);
 
-                // use helper fxn, initialDiff should be 1 since we added to the left, and our insertion detector should be set to true
+                // initialDiff should be 1 since we added to the left. StopOnInsert=true.
                 rebalanceUp(curr, 1, true);
                 return;
             } 
@@ -190,7 +188,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
                 AVLNode<Key, Value>* node = new AVLNode<Key, Value>(new_item.first, new_item.second, curr);
                 curr->setRight(node);
 
-                // use helper fxn, initialDiff should be -1 since we added to the right, and our insertion detector should be set to true
+                // initialDiff should be -1 since we added to the right. StopOnInsert=true.
                 rebalanceUp(curr, -1, true);
                 return;
             } 
@@ -209,8 +207,6 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
 template<class Key, class Value>
 void AVLTree<Key, Value>:: remove(const Key& key)
 {
-    // TODO 
-
     // error catch if key not in tree already
     AVLNode<Key, Value>* nodeToRemove = static_cast<AVLNode<Key, Value>*>(this->internalFind(key));
     if(nodeToRemove == nullptr) {
@@ -220,11 +216,11 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     // check to see if nodeToRemove has 2 kids, if so then we swap until there's only <=1 kid associated with it 
     while (nodeToRemove->getLeft() != nullptr && nodeToRemove->getRight() != nullptr) {
         AVLNode<Key, Value>* pred = static_cast<AVLNode<Key, Value>*>(this->predecessor(nodeToRemove));
-        nodeSwap(nodeToRemove, pred); // swap so nodeToRemove will still point at the node we want to nuke but placed in pred spot
+        nodeSwap(nodeToRemove, pred); 
     }
 
     // populate a child node pointer with either the leftmost child or, after we run out of left kids, the right child
-    AVLNode<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight(); // this syntax is so much better looking than the if statements that would take its place tbh
+    AVLNode<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight(); 
 
     AVLNode<Key, Value>* parent = nodeToRemove->getParent();
 
@@ -234,7 +230,6 @@ void AVLTree<Key, Value>:: remove(const Key& key)
         shrunkLeft = (parent->getLeft() == nodeToRemove);
     }
 
-    // ohhh my god the nesting is so ugly here
     // if there's no parent node (i.e. we're at root) then nuke root
     if (parent == nullptr) {
         this->root_ = child;
@@ -247,7 +242,6 @@ void AVLTree<Key, Value>:: remove(const Key& key)
 
     // there is a parent node so we let a child take parent's place
     else {
-        // can use given getters and setters declared in class 
         // node to be nuked is on the left of our parent node, so use child to take its place
         if (parent->getLeft() == nodeToRemove) {
             parent->setLeft(child);
@@ -268,124 +262,237 @@ void AVLTree<Key, Value>:: remove(const Key& key)
 
     // now we can rebalance if needed
     if(parent != nullptr){
-        rebalanceUp(parent, (shrunkLeft ? -1 : +1), false); // initialDiff will depend on which side had an element removed from it
+        // Removal uses stopOnInsertBehavior=false.
+        // If left subtree shrank, balance change is -1. If right shrank, balance change is +1.
+        rebalanceUp(parent, (shrunkLeft ? -1 : +1), false); 
     }
 
 }
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::rotateLeft(AVLNode<Key, Value>* node){
-    if (node == nullptr) return;
-    AVLNode<Key, Value>* r = node->getRight();
-    if (r == nullptr) return;
+    if (node == nullptr || node->getRight() == nullptr){
+        return;
+    }
 
-    AVLNode<Key, Value>* p = node->getParent();
+    AVLNode<Key, Value>* node2 = node->getRight();
+    AVLNode<Key, Value>* parent = node->getParent();
 
-    node->setRight(r->getLeft());
-    if (r->getLeft() != nullptr) r->getLeft()->setParent(node);
+    // 1. Move node2's left child to node's right
+    node->setRight(node2->getLeft());
+    if(node2->getLeft() != nullptr){
+        node2->getLeft()->setParent(node);
+    }
 
-    r->setLeft(node);
-    node->setParent(r);
+    // 2. node becomes node2's left child
+    node2->setLeft(node);
+    node->setParent(node2);
 
-    r->setParent(p);
-    if (p == nullptr) this->root_ = r;
-    else if (static_cast<AVLNode<Key, Value>*>(p)->getLeft() == node) p->setLeft(r);
-    else p->setRight(r);
+    // 3. Update parent pointers
+    node2->setParent(parent);
+    if(parent == nullptr){
+        this->root_ = node2;
+    }
+    else if(parent->getLeft() == node){
+        parent->setLeft(node2);
+    }
+    else{
+        parent->setRight(node2);
+    }
 }
 
 // just a repeat of rotateLeft but reversed left/right
 template<class Key, class Value>
 void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node){
-    if (node == nullptr) return;
-    AVLNode<Key, Value>* l = node->getLeft();
-    if (l == nullptr) return;
+    if (node == nullptr || node->getLeft() == nullptr){
+        return;
+    }
 
-    AVLNode<Key, Value>* p = node->getParent();
+    AVLNode<Key, Value>* node2 = node->getLeft(); 
+    AVLNode<Key, Value>* parent = node->getParent();
 
-    node->setLeft(l->getRight());
-    if (l->getRight() != nullptr) l->getRight()->setParent(node);
+    // 1. Move node2's right child to node's left
+    node->setLeft(node2->getRight());
+    if(node2->getRight() != nullptr){
+        node2->getRight()->setParent(node);
+    }
 
-    l->setRight(node);
-    node->setParent(l);
+    // 2. node becomes node2's right child
+    node2->setRight(node);
+    node->setParent(node2);
 
-    l->setParent(p);
-    if (p == nullptr) this->root_ = l;
-    else if (static_cast<AVLNode<Key, Value>*>(p)->getLeft() == node) p->setLeft(l);
-    else p->setRight(l);
+    // 3. Update parent pointers
+    node2->setParent(parent);
+    if(parent == nullptr){
+        this->root_ = node2;
+    }
+    else if(parent->getLeft() == node){
+        parent->setLeft(node2);
+    }
+    else{
+        parent->setRight(node2);
+    }
 }
 
 // helper function for rebalancing (i got annoyed by repeating my code in insert and remove)
 template<class Key, class Value>
-void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initialDiff, bool stopOnInsertBehavior)
+void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* parent, int8_t initialDiff, bool stopOnInsertBehavior)
 {
-    if (start == nullptr) return;
+    if (parent == nullptr) {
+        return;
+    }
 
-    AVLNode<Key, Value>* parent = start;
-    AVLNode<Key, Value>* child = (initialDiff == 1) ? start->getLeft() : start->getRight();
+    // `parent` is the node currently being checked.
+    // `diff` is the balance change from the child subtree.
+    
+    AVLNode<Key, Value>* child = nullptr; // Tracks the new subtree root after rotation, or the node we left when traversing up.
     int8_t diff = initialDiff;
 
     while (parent != nullptr) {
+        
         parent->updateBalance(diff);
-        int8_t b = parent->getBalance();
+        int8_t parentBalance = parent->getBalance(); 
 
-        if (stopOnInsertBehavior && b == 0) return; // height unchanged on insert
-        if (!stopOnInsertBehavior && (b == 1 || b == -1)) return; // height unchanged on delete
+        // 1. Check for Termination / Traversal (No Rotation needed yet)
 
-        if (b == 2) { // left heavy
+        // Case A: Balance is 0
+        if (parentBalance == 0) {
+            if (stopOnInsertBehavior) { // INSERTION: Height is same, stop.
+                break;
+            }
+            // REMOVAL: Height shrank, continue up.
+        } 
+        // Case B: Balance is +/-1
+        else if (parentBalance == 1 || parentBalance == -1) {
+            if (!stopOnInsertBehavior) { // REMOVAL: Height maintained, stop.
+                break;
+            }
+            // INSERTION: Height increased, continue up.
+        }
+        // Case C: Balance is +/-2 (Rotation required) - Handled below
+
+        // If we are continuing up (parentBalance was 0 for removal, or +/-1 for insertion)
+        if (parentBalance != 2 && parentBalance != -2) {
+            child = parent; // The node we just finished checking
+            parent = parent->getParent();
+
+            if (parent == nullptr){
+                break;
+            }
+
+            // Determine new diff for the next level up.
+            if (child == parent->getLeft()) {
+                // Left subtree changed: +1 for insert, -1 for removal
+                diff = stopOnInsertBehavior ? 1 : -1;
+            } else {
+                // Right subtree changed: -1 for insert, +1 for removal
+                diff = stopOnInsertBehavior ? -1 : 1;
+            }
+            continue; // Go to the next iteration
+        }
+
+        // 2. ROTATION LOGIC (parentBalance is 2 or -2)
+
+        // Left Heavy (+2)
+        if (parentBalance == 2) {
             AVLNode<Key, Value>* L = parent->getLeft();
-            if (L->getBalance() >= 0) { // LL
+            
+            if (L->getBalance() >= 0) { // Zig-Zig Left (LL or L0)
+                // Zig-Zig Rotation (Right Rotation)
                 rotateRight(parent);
-                if (L->getBalance() == 0) {
+
+                if (L->getBalance() == 0) { // L0 case (only possible on removal/shrink)
                     parent->setBalance(1);
                     L->setBalance(-1);
-                    if (stopOnInsertBehavior) return;
-                } else {
+                    if (!stopOnInsertBehavior) break; // L0 case stops rebalancing for removal
+                } else { // LL case (L->getBalance() == 1)
                     parent->setBalance(0);
                     L->setBalance(0);
+                    if (stopOnInsertBehavior) break; // LL case stops rebalancing for insertion
                 }
-                child = L;
-            } else { // LR
+                
+                child = L; // New subtree root
+
+            } else { // Zig-Zag Left (LR) (L->getBalance() == -1)
+                // Double Rotation (Left(L) then Right(P))
                 AVLNode<Key, Value>* LR = L->getRight();
                 rotateLeft(L);
                 rotateRight(parent);
-                int8_t cb = LR->getBalance();
-                if (cb == 1) { parent->setBalance(-1); L->setBalance(0); }
-                else if (cb == 0) { parent->setBalance(0); L->setBalance(0); }
-                else if (cb == -1) { parent->setBalance(0); L->setBalance(1); }
+
+                // Balance updates based on LR's balance before rotation
+                if (LR->getBalance() == 1) {
+                    parent->setBalance(-1);
+                    L->setBalance(0);
+                } else if (LR->getBalance() == 0) {
+                    parent->setBalance(0);
+                    L->setBalance(0);
+                } else { // LR->getBalance() == -1
+                    parent->setBalance(0);
+                    L->setBalance(1);
+                }
                 LR->setBalance(0);
-                child = LR;
+                
+                if (stopOnInsertBehavior) break; // Double rotation always stops rebalancing for insertion
+                
+                child = LR; // New subtree root
             }
-        } else if (b == -2) { // right heavy
+        } 
+        
+        // Right Heavy (-2)
+        else { // parentBalance == -2
             AVLNode<Key, Value>* R = parent->getRight();
-            if (R->getBalance() <= 0) { // RR
+
+            if (R->getBalance() <= 0) { // Zig-Zig Right (RR or R0)
+                // Zig-Zig Rotation (Left Rotation)
                 rotateLeft(parent);
-                if (R->getBalance() == 0) {
+
+                if (R->getBalance() == 0) { // R0 case (only possible on removal/shrink)
                     parent->setBalance(-1);
                     R->setBalance(1);
-                    if (stopOnInsertBehavior) return;
-                } else {
+                    if (!stopOnInsertBehavior) break; // R0 case stops rebalancing for removal
+                } else { // RR case (R->getBalance() == -1)
                     parent->setBalance(0);
                     R->setBalance(0);
+                    if (stopOnInsertBehavior) break; // RR case stops rebalancing for insertion
                 }
-                child = R;
-            } else { // RL
+                
+                child = R; // New subtree root
+
+            } else { // Zig-Zag Right (RL) (R->getBalance() == 1)
+                // Double Rotation (Right(R) then Left(P))
                 AVLNode<Key, Value>* RL = R->getLeft();
                 rotateRight(R);
                 rotateLeft(parent);
-                int8_t cb = RL->getBalance();
-                if (cb == -1) { parent->setBalance(1); R->setBalance(0); }
-                else if (cb == 0) { parent->setBalance(0); R->setBalance(0); }
-                else if (cb == 1) { parent->setBalance(0); R->setBalance(-1); }
+
+                // Balance updates based on RL's balance before rotation
+                if (RL->getBalance() == -1) {
+                    parent->setBalance(1);
+                    R->setBalance(0);
+                } else if (RL->getBalance() == 0) {
+                    parent->setBalance(0);
+                    R->setBalance(0);
+                } else { // RL->getBalance() == 1
+                    parent->setBalance(0);
+                    R->setBalance(-1);
+                }
                 RL->setBalance(0);
-                child = RL;
+                
+                if (stopOnInsertBehavior) break; // Double rotation always stops rebalancing for insertion
+                
+                child = RL; // New subtree root
             }
         }
-
-        AVLNode<Key, Value>* up = (child != nullptr) ? child->getParent() : parent->getParent();
-        if (up == nullptr) return;
-        diff = (child != nullptr) ? ((child == up->getLeft()) ? 1 : -1)
-                                  : ((parent == up->getLeft()) ? 1 : -1);
+        
+        // If we reach here after a rotation during removal (and didn't break on L0/R0), 
+        // the height shrank, and we need to continue up from the new root (`child`).
+        
+        AVLNode<Key, Value>* up = child->getParent();
+        if (up == nullptr) break;
+        
         parent = up;
+        // Removal diff continues up.
+        diff = (child == parent->getLeft()) ? -1 : 1;
+        // Loop will continue to check the balance of the new parent.
     }
 }
 
