@@ -675,7 +675,7 @@ template<typename Key, typename Value>
 bool BinarySearchTree<Key, Value>::isBalanced() const
 {
     // TODO
-   checkDepth(root_) != -1; // i think we can just use the helper fxn from equalPaths? this is asking for the same thing basically 
+   return checkDepth(root_) != -1; // i think we can just use the helper fxn from equalPaths? this is asking for the same thing basically 
 }
 
 
