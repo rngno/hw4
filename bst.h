@@ -708,7 +708,9 @@ template<typename Key, typename Value>
 bool BinarySearchTree<Key, Value>::isBalanced() const
 {
     // TODO
-   return checkDepth(root_) != -1; // i think we can just use the helper fxn from equalPaths? this is asking for the same thing basically 
+   //return checkDepth(root_) != -1; // i think we can just use the helper fxn from equalPaths? this is asking for the same thing basically 
+
+    return checkBalanced(root_) != -1; // testing new helper fxn
 }
 
 // helper function for isBalanced, returns -1 if unbalanced, else returns depth of subtree
@@ -746,6 +748,37 @@ static int checkDepth(Node<Key,Value> *root) {
     return (leftTree == rightTree) ? (leftTree + 1) : -1;
 }
 
+// helper function for isBalanced, returns -1 if unbalanced, else returns height of subtree
+// testing this out since checkDepth is a little broken lol
+template<typename Key, typename Value>
+static int checkBalanced(Node<Key,Value>* node) {
+    // base case
+    if (node == nullptr) {
+        return 0;
+    }
+
+    // recurse down left subtree 
+    int leftTree = checkBalanced(node->getLeft());
+    if (leftTree == -1) {
+        return -1;
+    }
+
+    // recurse down right subtree
+    int rightTree = checkBalanced(node->getRight());
+    // right subtree unbalanced
+    if (rightTree == -1){
+        return -1;
+    }
+
+    // now check balance btwn subtrees
+    int diff = (leftTree > rightTree) ? (leftTree - rightTree) : (rightTree - leftTree); // could make this an if statement but it looks cuter this way (i hate nesting) 
+    if (diff > 1){
+        return -1;
+    }
+
+    // balanced, might as well return the height lol
+    return 1 + ((leftTree > rightTree) ? leftTree : rightTree); // could make this an if statement but it looks cuter this way (i hate nesting)
+}
 
 
 template<typename Key, typename Value>
