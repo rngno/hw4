@@ -478,7 +478,7 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* parent, int8_t initia
             // zig-zag tests but RL lol
             else { 
                 AVLNode<Key, Value>* RL = right->getLeft();
-                rotateRight(R);
+                rotateRight(right);
                 rotateLeft(parent);
 
                 // balance handling post-rotation
