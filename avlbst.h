@@ -155,7 +155,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
 
     // if tree is empty, we can just insert at root and skip the rest
     if(this->root_ == NULL) {
-        root_ = new AVLNode<Key, Value>(new_item.first, new_item.second, NULL);
+        this->root_ = new AVLNode<Key, Value>(new_item.first, new_item.second, NULL);
         return;
     }
 
@@ -219,7 +219,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
 
     // check to see if nodeToRemove has 2 kids, if so then we swap until there's only <=1 kid associated with it 
     while (nodeToRemove->getLeft() != nullptr && nodeToRemove->getRight() != nullptr) {
-        AVLNode<Key, Value>* pred = predecessor(nodeToRemove);
+        AVLNode<Key, Value>* pred = this->predecessor(nodeToRemove);
         nodeSwap(nodeToRemove, pred); // swap so nodeToRemove will still point at the node we want to nuke but placed in pred spot
     }
 
