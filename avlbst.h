@@ -429,7 +429,8 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
                     left->setBalance(0);
                 }
                 // keep moving up from left post-rotation
-                child = (left->getParent() != nullptr) ? left->getParent() : left;
+                //child = (left->getParent() != nullptr) ? left->getParent() : left;
+                child = left;
             } 
             else {
                 AVLNode<Key, Value>* leftChild = parent->getLeft();
@@ -468,7 +469,8 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
                     parent->setBalance(0);
                     right->setBalance(0);
                 }
-                child = (right->getParent() != nullptr) ? right->getParent() : right;
+                //child = (right->getParent() != nullptr) ? right->getParent() : right;
+                child = right;
             } 
             else {
                 AVLNode<Key, Value>* rightChild = parent->getRight();
