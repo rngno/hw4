@@ -159,7 +159,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
         return;
     }
 
-    AVLNode<Key, Value>* curr = this->root_; 
+    Node<Key, Value>* curr = this->root_; 
 
     // find insertion spot or existing key
     while (true) {
@@ -237,7 +237,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     // ohhh my god the nesting is so ugly here
     // if there's no parent node (i.e. we're at root) then nuke root
     if (parent == nullptr) {
-        root_ = child;
+        this->root_ = child;
 
         // child becomes new root node if the rest of the tree isn't empty
         if (child != nullptr){
