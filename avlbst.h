@@ -507,8 +507,33 @@ void AVLTree<Key, Value>::rebalanceUp(AVLNode<Key, Value>* start, int8_t initial
             break;
         }
 
-        // compute diff for next parent: +1 if left subtree changed, -1 if right subtree changed
-        diff = (child == up->getLeft()) ? 1 : -1;
+        // check if left or right subtree changed and alter diff accordingly (left +1, right -1)
+        //diff = (child == up->getLeft()) ? 1 : -1;
+
+        // trying to handle choosing the next parent to walk upwards with safely (i hope this works)
+        AVLNode<Key, Value>* up = nullptr;
+        // if the child is not null, then we can proceed as normal
+        if (child != nullptr) {
+            up = child->getParent();
+        }
+        // otherwise, we have to just use the parent's parent instead so we don't segfault here
+        else {
+            up = parent->getParent();
+        }
+
+        // error handling if up doesn't get updated somehow or walks off course
+        if (up == nullptr) {
+            break;
+        }
+
+        // figure out if left or right subtree changed and alter diff accordingly (left +1, right -1)
+        // putting another version of this in down here to test
+        if (child != nullptr){
+            diff = (child == up->getLeft()) ? 1 : -1;
+        }
+        else{
+            diff = (parent == up->getLeft()) ? 1 : -1;
+        } 
 
         // height didn't shrink at all during removal handling
         if (!stopOnInsertBehavior) {
