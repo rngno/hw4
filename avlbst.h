@@ -159,7 +159,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
         return;
     }
 
-    Node<Key, Value>* curr = this->root_; 
+    AVLNode<Key, Value>* curr = static_cast<AVLNode<Key, Value>*>(this->root_); 
 
     // find insertion spot or existing key
     while (true) {
@@ -219,7 +219,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
 
     // check to see if nodeToRemove has 2 kids, if so then we swap until there's only <=1 kid associated with it 
     while (nodeToRemove->getLeft() != nullptr && nodeToRemove->getRight() != nullptr) {
-        AVLNode<Key, Value>* pred = this->predecessor(nodeToRemove);
+        AVLNode<Key, Value>* pred = static_cast<AVLNode<Key, Value>*>(this->predecessor(nodeToRemove));
         nodeSwap(nodeToRemove, pred); // swap so nodeToRemove will still point at the node we want to nuke but placed in pred spot
     }
 
